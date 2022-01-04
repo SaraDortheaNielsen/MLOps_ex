@@ -4,48 +4,50 @@ from torch.utils.data import Dataset, DataLoader
 
 
 def mnist():
-    # exchange with the corrupted mnist dataset
-    #train = torch.randn(50000, 784)
-    test = torch.randn(10000, 784) 
+      # exchange with the corrupted mnist dataset
+      #train = torch.randn(50000, 784)
+      #test = torch.randn(10000, 784) 
 
-    #train
-    train0 = np.load("train_0.npz")
-    train1 = np.load("train_1.npz")
-    train2 = np.load("train_2.npz")
-    train3 = np.load("train_3.npz")
-    train4 = np.load("train_4.npz")
-    
-    t0 = torch.from_numpy(train0.f.images)
-    t1 = torch.from_numpy(train1.f.images)
-    t2 = torch.from_numpy(train2.f.images)
-    t3 = torch.from_numpy(train3.f.images)
-    t4 = torch.from_numpy(train4.f.images)
-    t_tot = torch.cat((t0,t1,t2,t3,t4), 0)
+      #train
+      train0 = np.load("train_0.npz")
+      train1 = np.load("train_1.npz")
+      train2 = np.load("train_2.npz")
+      train3 = np.load("train_3.npz")
+      train4 = np.load("train_4.npz")
+      train_images = torch.cat((torch.from_numpy(train0.f.images),torch.from_numpy(train1.f.images),torch.from_numpy(train2.f.images),torch.from_numpy(train3.f.images),torch.from_numpy(train4.f.images),), 0)
+      train_labels = torch.cat((torch.from_numpy(train0.f.labels),torch.from_numpy(train1.f.labels),torch.from_numpy(train2.f.labels),torch.from_numpy(train3.f.labels),torch.from_numpy(train4.f.labels),), 0)
+      train = Dataset(train_images, train_labels)
 
-    l0 = torch.from_numpy(train0.f.labels)
-    l1 = torch.from_numpy(train1.f.labels)
-    l2 = torch.from_numpy(train2.f.labels)
-    l3 = torch.from_numpy(train3.f.labels)
-    l4 = torch.from_numpy(train4.f.labels)
-    l_tot = torch.cat((l0,l1,l2,l3,l4), 0)
+      #test
+      test0 = np.load("test.npz")
+      test_images = torch.from_numpy(test0.f.images)
+      test_labels = torch.from_numpy(test0.f.labels)
+      test = Dataset(test_images, test_labels)
 
-    
-    #train = {'images': t_tot, 'labels': l_tot}
+      #train = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
+      
 
-    #train
-    test0 = np.load("train_0.npz")
-    t = torch.from_numpy(train0.f.images)
-    l = torch.from_numpy(train0.f.labels)
-    #test = {'images': t, 'labels': l}
+      return train, test
 
 
-    
+class Dataset(torch.utils.data.Dataset):
+  'Characterizes a dataset for PyTorch'
+  def __init__(self, images, labels):
+        'Initialization'
+        self.labels = labels
+        self.images = images
 
+  def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.images)
 
-    train = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
-   
+  def __getitem__(self, index):
+        'Generates one sample of data'
+        # Select sample
+        X = self.images[index]
 
-    return train, test
+        # Load data and get label
+        #X = torch.load('data/' + ID + '.pt')
+        y = self.labels[index]
 
-
-def load_mn():
+        return X, y
